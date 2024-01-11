@@ -33,24 +33,25 @@ function Board({ xIsNext, onPlay, squares }) {
     status = xIsNext ? "next move for X" : "next move for O";
   }
 
+  // Generate rows and colums of Square components. This way similar code repetition for each row is avoided and and it's more scalable regarding changing board size.
+  const rows = [...Array(3)].map((e, i) => (
+    <div key={i} className="board-row">
+      {[...Array(3)].map((e, j) => {
+        return (
+          <Square
+            key={j}
+            value={squares[j + i * 3]}
+            onSquareClick={() => handleClick(j + i * 3)}
+          />
+        );
+      })}
+    </div>
+  ));
+
   return (
     <>
       <div className="status">{status}</div>
-      <div className="board-row">
-        <Square value={squares[0]} onSquareClick={() => handleClick(0)} />
-        <Square value={squares[1]} onSquareClick={() => handleClick(1)} />
-        <Square value={squares[2]} onSquareClick={() => handleClick(2)} />
-      </div>
-      <div className="board-row">
-        <Square value={squares[3]} onSquareClick={() => handleClick(3)} />
-        <Square value={squares[4]} onSquareClick={() => handleClick(4)} />
-        <Square value={squares[5]} onSquareClick={() => handleClick(5)} />
-      </div>
-      <div className="board-row">
-        <Square value={squares[6]} onSquareClick={() => handleClick(6)} />
-        <Square value={squares[7]} onSquareClick={() => handleClick(7)} />
-        <Square value={squares[8]} onSquareClick={() => handleClick(8)} />
-      </div>
+      {rows}
     </>
   );
 }
