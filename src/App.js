@@ -59,8 +59,13 @@ function Board({ xIsNext, onPlay, squares }) {
 export default function Game() {
   const [history, setHistory] = useState([Array(9).fill(null)]);
   const [currentMove, setCurrentMove] = useState(0);
+  const [sortAscending, setSortAscending] = useState(true);
   let xIsNext = currentMove % 2 === 0;
   const currentSquares = history[currentMove];
+
+  function handleToggle() {
+    setSortAscending(!sortAscending);
+  }
 
   function handlePlay(nextSquares) {
     // Add the current boardstate or "squares" to the history.
@@ -105,7 +110,9 @@ export default function Game() {
         />
       </div>
       <div className="game-info">
-        <ol>{moves}</ol>
+        {/* Based on the sort state show the moves reversed or not */}
+        <ul>{sortAscending ? moves : [...moves].reverse()}</ul>
+        <button onClick={handleToggle}>Toggle order</button>
       </div>
     </div>
   );
