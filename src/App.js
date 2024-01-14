@@ -12,7 +12,7 @@ function Square({ value, onSquareClick, winningSquare }) {
   );
 }
 
-function Board({ xIsNext, onPlay, squares }) {
+function Board({ xIsNext, onPlay, squares, currentMove }) {
   function handleClick(i) {
     // Check if the square is already filled or there was a winner
     const { winner } = calculateWinner(squares);
@@ -33,7 +33,9 @@ function Board({ xIsNext, onPlay, squares }) {
   const { winner, winningLine } = calculateWinner(squares);
   let status;
   if (winner) {
-    status = `winner is: ${winner}`;
+    status = `winner is: ${winner}!`;
+  } else if (currentMove === 9) {
+    status = `There is no winner!`;
   } else {
     status = xIsNext ? "next move for X" : "next move for O";
   }
@@ -112,8 +114,8 @@ export default function Game() {
         <Board
           squares={currentSquares}
           onPlay={handlePlay}
-          status={status}
           xIsNext={xIsNext}
+          currentMove={currentMove}
         />
       </div>
       <div className="game-info">
