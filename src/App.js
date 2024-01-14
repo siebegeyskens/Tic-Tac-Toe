@@ -1,8 +1,12 @@
 import { useState } from "react";
 
-function Square({ value, onSquareClick }) {
+function Square({ value, onSquareClick, winningSquare }) {
   return (
-    <button className="square" onClick={onSquareClick}>
+    <button
+      className="square"
+      onClick={onSquareClick}
+      style={winningSquare ? { border: "2px solid red" } : {}}
+    >
       {value}
     </button>
   );
@@ -11,7 +15,8 @@ function Square({ value, onSquareClick }) {
 function Board({ xIsNext, onPlay, squares }) {
   function handleClick(i) {
     // Check if the square is already filled or there was a winner
-    if (squares[i] || calculateWinner(squares)) {
+    const { winner } = calculateWinner(squares);
+    if (squares[i] || winner) {
       return;
     }
     // Copy the squares state (immutability)
@@ -25,7 +30,7 @@ function Board({ xIsNext, onPlay, squares }) {
     onPlay(nextSquares);
   }
 
-  const winner = calculateWinner(squares);
+  const { winner, winningLine } = calculateWinner(squares);
   let status;
   if (winner) {
     status = `winner is: ${winner}`;
@@ -37,11 +42,13 @@ function Board({ xIsNext, onPlay, squares }) {
   const rows = [...Array(3)].map((e, i) => (
     <div key={i} className="board-row">
       {[...Array(3)].map((e, j) => {
+        const squareNumber = j + i * 3;
         return (
           <Square
-            key={j}
-            value={squares[j + i * 3]}
-            onSquareClick={() => handleClick(j + i * 3)}
+            key={squareNumber}
+            value={squares[squareNumber]}
+            onSquareClick={() => handleClick(squareNumber)}
+            winningSquare={winningLine && winningLine.includes(squareNumber)}
           />
         );
       })}
@@ -133,8 +140,15 @@ function calculateWinner(squares) {
   for (let i = 0; i < lines.length; i++) {
     const [a, b, c] = lines[i];
     if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-      return squares[a];
+      // return squares[a];
+      return {
+        winner: squares[a],
+        winningLine: [a, b, c],
+      };
     }
   }
-  return null;
+  return {
+    winner: null,
+    winningLine: null,
+  };
 }
