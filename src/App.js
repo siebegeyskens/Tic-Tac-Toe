@@ -27,7 +27,7 @@ function Board({ xIsNext, onPlay, squares, currentMove }) {
     } else {
       nextSquares[i] = "O";
     }
-    onPlay(nextSquares);
+    onPlay(nextSquares, i);
   }
 
   const { winner, winningLine } = calculateWinner(squares);
@@ -66,20 +66,25 @@ function Board({ xIsNext, onPlay, squares, currentMove }) {
 }
 
 export default function Game() {
-  const [history, setHistory] = useState([Array(9).fill(null)]);
+  const [history, setHistory] = useState([
+    { squares: Array(9).fill(null), moveLocation: -1 },
+  ]);
   const [currentMove, setCurrentMove] = useState(0);
   const [sortAscending, setSortAscending] = useState(true);
   let xIsNext = currentMove % 2 === 0;
-  const currentSquares = history[currentMove];
+  const currentSquares = history[currentMove].squares;
 
   function handleToggle() {
     setSortAscending(!sortAscending);
   }
 
-  function handlePlay(nextSquares) {
+  function handlePlay(nextSquares, location) {
     // Add the current boardstate or "squares" to the history.
     // - The slice is there in case the game jumped to a previous move, after a player clicks it will then keep the history untill the move that was jumped to and start adding to the history from there.
-    let nextHistory = [...history.slice(0, currentMove + 1), nextSquares];
+    let nextHistory = [
+      ...history.slice(0, currentMove + 1),
+      { squares: nextSquares, location: location },
+    ];
     setHistory(nextHistory);
     setCurrentMove(nextHistory.length - 1);
   }
@@ -89,10 +94,13 @@ export default function Game() {
   }
 
   // Why wouldn't I have moves as a component in stead of a variable?
-  const moves = history.map((squares, move) => {
+  const moves = history.map((turnInfo, move) => {
     let description;
+    let row = Math.floor(turnInfo.location / 3) + 1;
+    let column = (turnInfo.location % 3) + 1;
     if (move > 0) {
-      description = "Go to move #" + move;
+      // description = "Go to move #" + move + " ";
+      description = `Go to move # ${move} (${row}, ${column})`;
     } else {
       description = "Go to game start.";
     }
@@ -100,7 +108,9 @@ export default function Game() {
     return (
       <li key={move}>
         {move === currentMove ? (
-          <p>You are at move #{move}</p>
+          <p>
+            You are at move #{move} {move !== 0 ? `(${row}, ${column})` : ""}
+          </p>
         ) : (
           <button onClick={() => jumpTo(move)}>{description}</button>
         )}
